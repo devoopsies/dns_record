@@ -49,6 +49,14 @@ function list_record {
     fi
 }
 
+# Function to list all records in BIND9 format
+function list_all {
+    query="SELECT * FROM dns where typeid='$typeidvar'"
+    IFS=' '
+    complete=$(sqlite3 dns_data.db "$query" | sed 's/|/ /g' |awk '{print $2"."$3" IN "$4" "$5}')
+    echo $complete
+}
+
 # Function to delete records in database
 function delete_record {
     # First we must prompt for host name
@@ -80,14 +88,6 @@ function delete_record {
         echo "No changes made"
         echo "Goodbye"
     fi
-}
-
-# Function to list all records in BIND9 format
-function list_all {
-    query="SELECT * FROM dns where typeid='$typeidvar'"
-    IFS=' '
-    complete=$(sqlite3 dns_data.db "$query" | sed 's/|/ /g' |awk '{print $2"."$3" IN "$4" "$5}')
-    echo $complete
 }
 
 # Code to list a record. Calls the list_record function
