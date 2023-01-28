@@ -7,7 +7,7 @@ function add_record {
         read "record_data"
         record_add="INSERT INTO dns (typeid, host, domain, record_type, record_data) VALUES('3', '$host', '$domain', '$record_type', '$record_data')"
         record_add_manage="INSERT INTO dns (typeid, host, domain, record_type, record_data) VALUES('3', 'manage.$host', '$domain', '$record_type', '$record_data')"
-        sqlite3 testdb.db "$record_add"
+        sqlite3 dns_data.db "$record_add"
         # List all records to be added
         # Management records with unique data still need to be coded. For now we can add record twice, once as 'manage.$host.domain.tld'
         echo "A record with the following data has been added:"
@@ -33,10 +33,10 @@ function list_record {
         echo "You have queried the following entry:" $host.$domain
         #Run the query and clean it up in-line
         #I should clean this up so the query is run once and the data is picked from that
-        complete=$(sqlite3 testdb.db "$query" | sed 's/|/ /g' |awk '{print $2"."$3" IN "$4" "$5}')
-        full=$(sqlite3 testdb.db "$query" | sed 's/|/ /g' |awk '{print $2"."$3}')
-        type=$(sqlite3 testdb.db "$query" | sed 's/|/ /g' |awk '{print $4}')
-        data=$(sqlite3 testdb.db "$query" | sed 's/|/ /g' |awk '{print $5}')
+        complete=$(sqlite3 dns_data.db "$query" | sed 's/|/ /g' |awk '{print $2"."$3" IN "$4" "$5}')
+        full=$(sqlite3 dns_data.db "$query" | sed 's/|/ /g' |awk '{print $2"."$3}')
+        type=$(sqlite3 dns_data.db "$query" | sed 's/|/ /g' |awk '{print $4}')
+        data=$(sqlite3 dns_data.db "$query" | sed 's/|/ /g' |awk '{print $5}')
         echo "FQDN:           " $full
         echo "Record Type:    " $type
         echo "Record Data:    " $data
@@ -56,7 +56,7 @@ function delete_record {
         echo "The following record will be deleted:"
 
         # Using previously-set "query" variable, we set the variable "complete". This contains the output of entire command to run the SQL query
-        complete=$(sqlite3 testdb.db "$query" | sed 's/|/ /g' |awk '{print $2"."$3" IN "$4" "$5}')
+        complete=$(sqlite3 dns_data.db "$query" | sed 's/|/ /g' |awk '{print $2"."$3" IN "$4" "$5}')
         # List the output of the above command for confirmation
         echo $complete
 
@@ -67,7 +67,7 @@ function delete_record {
         if [ "$continue" == "ENTER" ]
         then
                 # RUn the actual delete using the previously-set "record_delete" variable as the command argument
-                sqlite3 testdb.db  "$record_delete"
+                sqlite3 dns_data.db  "$record_delete"
                 echo "The following record has been deleted:"
                 echo "    $host.$domain"
         else
