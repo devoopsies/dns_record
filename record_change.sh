@@ -85,6 +85,7 @@ function delete_record {
 function list_all {
     query="SELECT * FROM dns"
     complete=$(sqlite3 dns_data.db "$query" | sed 's/|/ /g' |awk '{print $2"."$3" IN "$4" "$5}')
+    echo $complete
 }
 
 # Code to list a record. Calls the list_record function
