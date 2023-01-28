@@ -28,6 +28,7 @@ function list_record {
     read host
     if [ -n $host ]
     then
+        typeidvar=3
         list_all
     else
     echo "Please enter a domain"
@@ -83,7 +84,8 @@ function delete_record {
 
 # Function to list all records in BIND9 format
 function list_all {
-    query="SELECT * FROM dns"
+    query="SELECT * FROM dns where typeid='$typeidvar'"
+    IFS=' '
     complete=$(sqlite3 dns_data.db "$query" | sed 's/|/ /g' |awk '{print $2"."$3" IN "$4" "$5}')
     echo $complete
 }
