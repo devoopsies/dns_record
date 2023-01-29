@@ -57,6 +57,17 @@ function list_all {
     echo $complete
 }
 
+# Funtion to generate zone files for all domains
+# Assumed directory to be "/etc/bind/zones/". Might update to take from bind9 conf
+function generate_zone_file {
+    typeidvar=1
+    list_all_domains
+    typeidvar=2
+    list_all_domains
+    typeidvar=3
+    list_all_domains
+}
+
 # Function to list all domains and group by domain
 function list_all_domains {
     query="SELECT DISTINCT domain FROM dns"
@@ -76,18 +87,6 @@ function list_all_domains {
         echo "${records[i]}"
         echo ""
     done
-}
-
-# Funtion to generate zone files for all domains
-# Assumed directory to be "/etc/bind/zones/". Might update to take from bind9 conf
-
-function generate_zone_file {
-    typeidvar=1
-    list_all_domains
-    typeidvar=2
-    list_all_domains
-    typeidvar=3
-    list_all_domains
 }
 
 # Function to delete records in database
