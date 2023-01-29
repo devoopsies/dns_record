@@ -68,13 +68,6 @@ function generate_zone_file {
     list_all_domains
 }
 
-function loop_through_type {
-    query="SELECT * FROM dns where domain='$domain' and typeid='$typeidvar'"
-    IFS=' '
-    complete=$(sqlite3 dns_data.db "$query" | sed 's/|/ /g' |awk '{print $2"."$3" IN "$4" "$5}')
-    records+=("$complete")
-}
-
 # Function to list all domains and group by domain
 function list_all_domains {
     query="SELECT DISTINCT domain FROM dns"
@@ -96,6 +89,13 @@ function list_all_domains {
         echo "${records[i]}"
         echo ""
     done
+}
+
+function loop_through_type {
+    query="SELECT * FROM dns where domain='$domain' and typeid='$typeidvar'"
+    IFS=' '
+    complete=$(sqlite3 dns_data.db "$query" | sed 's/|/ /g' |awk '{print $2"."$3" IN "$4" "$5}')
+    records+=("$complete")
 }
 
 # Function to delete records in database
