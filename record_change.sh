@@ -57,13 +57,15 @@ function list_all {
     echo $complete
 }
 
+# Function to list all domains and group by domain
 function list_all_domains {
-    big_query=$("SELECT domain FROM dns")
-    domains=$(sqlite3 dns_data.db "$big_query" |sort |uniq)
+    query="SELECT DISTINCT domain FROM dns"
+    IFS=$'\n'
+    domains=($(sqlite3 dns_data.db "$query"))
     records=()
     for domain in "${domains[@]}"
     do
-        query="SELECT * FROM dns where domain='$domain'"
+        query="SELECT * FROM dns where domain='$domain' and typeid='$typeidvar'"
         IFS=' '
         complete=$(sqlite3 dns_data.db "$query" | sed 's/|/ /g' |awk '{print $2"."$3" IN "$4" "$5}')
         records+=("$complete")
@@ -81,11 +83,11 @@ function list_all_domains {
 
 function generate_zone_file {
     typeidvar=1
-    list_all
+    list_all_domains
     typeidvar=2
-    list_all
+    list_all_domains
     typeidvar=3
-    list_all
+    list_all_domains
 }
 
 # Function to delete records in database
