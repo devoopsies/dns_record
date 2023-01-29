@@ -26,7 +26,7 @@ function add_record {
 function list_record {
     echo "Please enter a host"
     read host
-    if [ -n $host ]
+    if [ -z "$host" ]
     then
         typeidvar=3
         list_all
