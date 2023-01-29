@@ -57,6 +57,25 @@ function list_all {
     echo $complete
 }
 
+function list_all_domains {
+    big_query=$("SELECT domain FROM dns")
+    domains=$(sqlite3 dns_data.db "$big_query" |sort |uniq)
+    records=()
+    for domain in "${domains[@]}"
+    do
+        query="SELECT * FROM dns where domain='$domain'"
+        IFS=' '
+        complete=$(sqlite3 dns_data.db "$query" | sed 's/|/ /g' |awk '{print $2"."$3" IN "$4" "$5}')
+        records+=("$complete")
+    done
+
+    for ((i=0; i<${#domains[@]}; i++)); do
+        echo "Records for ${domains[i]}: "
+        echo "${records[i]}"
+        echo ""
+    done
+}
+
 # Funtion to generate zone files for all domains
 # Assumed directory to be "/etc/bind/zones/". Might update to take from bind9 conf
 
