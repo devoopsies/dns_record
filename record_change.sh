@@ -57,6 +57,18 @@ function list_all {
     echo $complete
 }
 
+# Funtion to generate zone files for all domains
+# Assumed directory to be "/etc/bind/zones/". Might update to take from bind9 conf
+
+function generate_zone_file {
+    typeidvar=1
+    list_all
+    typeidvar=2
+    list_all
+    typeidvar=3
+    list_all
+}
+
 # Function to delete records in database
 function delete_record {
     # First we must prompt for host name
@@ -120,10 +132,19 @@ then
     else
         echo "Record type must be one of: \"A|CNAME|MX|AAAA\""
     fi
+
+# Code to delete records
 elif [ "$1" == "delete" ]
 then
     delete_record
 
+# Code to print out DNS entries to file
+elif [ "$1" == "output" ]
+then
+    generate_zone_file
+
 else
-    echo "Please enter a valid option: \"list|add|delete\""
+    echo "Please enter a valid option: \"list|add|delete|output\""
 fi
+
+
