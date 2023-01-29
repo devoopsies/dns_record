@@ -33,11 +33,11 @@ function list_record {
     else
     echo "Please enter a domain"
     read domain
-    #set the query as a variable so that it may be passed to sqlite as a single parameter
+    # Set the query as a variable so that it may be passed to sqlite as a single parameter
     query="SELECT * FROM dns where HOST='$host' and domain='$domain'"
     echo "You have queried the following entry:" $host.$domain
-    #Run the query and clean it up in-line
-    #I should clean this up so the query is run once and the data is picked from that
+    # Run the query and clean it up in-line
+    # I should clean this up so the query is run once and the data is picked from that
     complete=$(sqlite3 dns_data.db "$query" | sed 's/|/ /g' |awk '{print $2"."$3" IN "$4" "$5}')
     full=$(sqlite3 dns_data.db "$query" | sed 's/|/ /g' |awk '{print $2"."$3}')
     type=$(sqlite3 dns_data.db "$query" | sed 's/|/ /g' |awk '{print $4}')
@@ -76,10 +76,12 @@ function list_all_domains {
     records=()
     for domain in "${domains[@]}"
     do
-        query="SELECT * FROM dns where domain='$domain' and typeid='$typeidvar'"
-        IFS=' '
-        complete=$(sqlite3 dns_data.db "$query" | sed 's/|/ /g' |awk '{print $2"."$3" IN "$4" "$5}')
-        records+=("$complete")
+        typeidvar=1
+        loop_through_type
+        typeidvar=2
+        loop_through_type
+        typeidvar=3
+        loop_through_type
     done
 
     for ((i=0; i<${#domains[@]}; i++)); do
@@ -87,6 +89,13 @@ function list_all_domains {
         echo "${records[i]}"
         echo ""
     done
+}
+
+loop_through_type {
+    query="SELECT * FROM dns where domain='$domain' and typeid='$typeidvar'"
+    IFS=' '
+    complete=$(sqlite3 dns_data.db "$query" | sed 's/|/ /g' |awk '{print $2"."$3" IN "$4" "$5}')
+    records+=("$complete")
 }
 
 # Function to delete records in database
@@ -153,18 +162,16 @@ then
         echo "Record type must be one of: \"A|CNAME|MX|AAAA\""
     fi
 
-# Code to delete records
+# Code to delete records. Calls the delete_record function
 elif [ "$1" == "delete" ]
 then
     delete_record
 
-# Code to print out DNS entries to file
+# Code to print out DNS entries to file. Calls the generate_zone_file function
 elif [ "$1" == "output" ]
 then
-    generate_zone_file
+    list_all_domains
 
 else
     echo "Please enter a valid option: \"list|add|delete|output\""
 fi
-
-
